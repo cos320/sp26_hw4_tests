@@ -14,7 +14,7 @@ module Tctxt = Oat.Tctxt
     functions in Typechecker.ml:
 
     subtype
-    typecheck_exp 
+    typecheck_exp
     typecheck_stmt
 *)
 
@@ -48,12 +48,24 @@ let googlers_tests = [
   (* TODO *)
 ]
 
+let arnav_john_unit_tests = [
+  "subtype func: |- (int, bool) -> bool <: (int, bool) -> bool",
+   (fun () ->
+       if Typechecker.subtype_func (Tctxt.empty) [TInt; TInt] (RetVal TBool) [TInt; TInt] (RetVal TBool) then ()
+       else failwith "should not fail")
+; ("no subtype func: |- int <: bool",
+   (fun () ->
+       if Typechecker.subtype_func Tctxt.empty [TInt; TInt] (RetVal TBool) [TBool; TInt] (RetVal TInt) then
+         failwith "should not succeed" else ())
+  )
+]
 
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
-  example_unit_tests1 @ 
-  example_unit_tests2 @ 
-  googlers_tests
+  example_unit_tests1 @
+  example_unit_tests2 @
+  googlers_tests @
+  arnav_john_unit_tests
 
 let rec n_ones n =
   match n with
