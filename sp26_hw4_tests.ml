@@ -43,10 +43,22 @@ let example_unit_tests2 = [
 ]
 
 
+(* Ben Aepli and Vedant Badoni's tests. *)
+let googlers_tests = [
+  (* TODO *)
+]
+
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @ 
-  example_unit_tests2
+  example_unit_tests2 @ 
+  googlers_tests
+
+let rec n_ones n =
+  match n with
+  | 0 -> ""
+  | n -> "1" ^ n_ones (n - 1)
 
 (** COMPLEX TESTS *)
 
@@ -84,6 +96,13 @@ let all_student_unit_tests =
     These test cases will be run via Gradedtests.oat_file_test.  For
     additional examples, see the tests/gradedtests.ml file.
 *)
+let bplus_tree_expected_4_128 = "quarter:\nx: -32y: 32z: -32\nthree quarters:\nx: 96y: -96z: 96\n 0"
+let bplus_tree_expected_8_2048 = "quarter:\nx: -512y: 512z: -512\nthree quarters:\nx: 1536y: -1536z: 1536\n 0"
+let bplus_tree_expected_128_64 = "quarter:\nx: -16y: 16z: -16\nthree quarters:\nx: 48y: -48z: 48\n 0"
+
 let student_complex_tests : (string * string * string) list = [
-    ("demo_color.oat", "", "20")
+    ("demo_color.oat", "", "20");
+    ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 4) (n_ones 128), bplus_tree_expected_4_128);
+    ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 8) (n_ones 2048), bplus_tree_expected_8_2048);
+    ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 128) (n_ones 64), bplus_tree_expected_128_64)
 ]
