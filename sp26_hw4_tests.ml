@@ -314,4 +314,6 @@ let student_complex_tests : (string * string * string) list = [
     ("hash_table_word_counter.oat", "you " ^ ai_text1, "There were 3 occurences of the word you.0");
     ("hash_table_word_counter.oat", "are " ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1, "There were 18 occurences of the word are.0");
 
+    (* Daniel Yang (yanda-hw4) *)
+    ("trie.oat", "", "8 4 1 0 1 0 6 6 5 4 0 0");
 ]
