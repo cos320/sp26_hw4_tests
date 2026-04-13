@@ -291,6 +291,10 @@ let bplus_tree_expected_4_128 = "quarter:\nx: -32y: 32z: -32\nthree quarters:\nx
 let bplus_tree_expected_8_2048 = "quarter:\nx: -512y: 512z: -512\nthree quarters:\nx: 1536y: -1536z: 1536\n 0"
 let bplus_tree_expected_128_64 = "quarter:\nx: -16y: 16z: -16\nthree quarters:\nx: 48y: -48z: 48\n 0"
 
+(* Ayush Isaac complex tests *)
+let ai_text1 = "sigma sigma on the wall who’s the skibidiest of them all you are you are yes you are "
+let ai_text2 = "Im over here taking a nap rn I got a pillow under my head rn sleeping so soundly Im a snoozer man"
+
 let student_complex_tests : (string * string * string) list = [
     ("demo_color.oat", "", "20");
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 4) (n_ones 128), bplus_tree_expected_4_128);
@@ -304,5 +308,10 @@ let student_complex_tests : (string * string * string) list = [
     ("stalin_sort.oat", "1 2 3 4 5", "1 2 3 4 5 0");
     ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
 
-    ("will_grace_nodes.oat", "", "6")
+    ("will_grace_nodes.oat", "", "6");
+    (* Isaac and Ayush *)
+    ("hash_table_word_counter.oat", "Im " ^ ai_text2, "There were 2 occurences of the word Im.0");
+    ("hash_table_word_counter.oat", "you " ^ ai_text1, "There were 3 occurences of the word you.0");
+    ("hash_table_word_counter.oat", "are " ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1, "There were 18 occurences of the word are.0");
+
 ]
