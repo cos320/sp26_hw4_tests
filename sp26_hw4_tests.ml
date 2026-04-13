@@ -337,6 +337,8 @@ let student_complex_tests : (string * string * string) list = [
     ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
 
     ("will_grace_nodes.oat", "", "6");
+    ("colin_jishnu.oat", "", "(4 (1 null null) (9 null null))\n 0");
+
     (* Isaac and Ayush *)
     ("hash_table_word_counter.oat", "Im " ^ ai_text2, "There were 2 occurences of the word Im.0");
     ("hash_table_word_counter.oat", "you " ^ ai_text1, "There were 3 occurences of the word you.0");
