@@ -1,0 +1,332 @@
+/* Sorts an array of non negative integers with no duplicates in O(nloglogM)
+time, where n is the number of elements and M is the max element */
+
+/* struct that holds a quotient and a remiander */
+struct Quo_rem {
+    int quo;
+    int rem
+}
+
+/* helper function to calculate quotient and remainder of b/a */
+/* returns Quo_rem{ quo = b//a, rem = b%a } */
+Quo_rem div_mod(int b, int a) {
+    var quo = 0;
+    var rem = b;
+
+    while( rem >= a ) {
+        var value = a;
+        var multiples = 1;
+
+        while( 2*value <= rem ) {
+            value = 2*value;
+            multiples = 2*multiples;
+        }
+
+        rem = rem - value;
+        quo = quo + multiples;
+
+    }
+
+    return new Quo_rem{quo=quo; rem=rem};
+}
+
+/* helper function to compute floor(sqrt(n)) */
+/* actually not used in the program */
+int sqrt_floor(int n) {
+    var i = 0;
+    while( (i+1)*(i+1) <= n ) {
+        i = i + 1;
+    }
+    return i;
+}
+
+/* helper function to compute ceil(sqrt(n))*/
+int sqrt_ceil(int n) {
+    var i = 0;
+    while( i*i < n ) {
+        i = i + 1;
+    }
+    return i;
+}
+
+/* helper function to compute the max in an array 
+of position integers */
+int max(int[] a) {
+    var max_num = -1;
+    for(var i=0; i<length(a); i=i+1;) {
+        if(a[i] > max_num) {
+            max_num = a[i];
+        }
+    }
+    return max_num;
+}
+
+/* VEB Data Structure */
+struct VEB {
+    int u;
+    int min; /* -1 means min and max not set yet */
+    int max; /* if min==max, only one of them is set */
+    VEB?[] children;
+    VEB? aux    /* if aux is null then only min and max exist */
+}
+
+/* init a VEB given U */
+VEB veb_init(int u) {
+    var veb = new VEB {
+        u = u;
+        min = -1;
+        max = -1;
+        children = new VEB?[sqrt_ceil(u)];
+        aux = VEB null
+    };
+    return veb;
+}
+
+/* predecessor search VEB function */
+int veb_pred(VEB veb, int x) {
+    /* base cases (none or one not set) */
+    if (veb.min == -1) {
+        return -1;
+    }
+    if (veb.min == veb.max & x >= veb.min) {
+        return veb.min;
+    }
+
+    /* base cases (both min and max are set) */
+    if (x >= veb.max) {
+        return veb.max;
+    }
+    if (x < veb.min) {
+        return -1;
+    }
+
+    /* base case (only min and max exist) */
+    if? (VEB aux = veb.aux) {
+
+    } else {
+        if (x >= veb.min) {
+            return veb.min;
+        } else {
+            return -1;
+        }
+    }
+
+    /* recursive case */
+    var quo_rem = div_mod(x, sqrt_ceil(veb.u));
+    var h = quo_rem.quo;
+    var l = quo_rem.rem;
+
+    /* recurse into child veb case */
+    if? ( VEB child = veb.children[h] ) {
+        if (l >= child.min) {
+            return h * sqrt_ceil(veb.u) + veb_pred(child, l);
+        }
+    }
+
+    /* use aux veb case */
+    if? (VEB auxillary = veb.aux) {
+        var i = veb_pred(auxillary, h-1);
+        if (i == -1) {
+            return veb.min;
+        }
+        if? (VEB child_i = veb.children[i]) {
+            return i * sqrt_ceil(veb.u) + child_i.max;
+        } else {
+            print_string("Error pred: Aux is children[i] null but wasn't caught in base case...");
+            return -1;
+        }
+    } else {
+        print_string("Error pred: Aux is null but wasn't caught in base case...");
+        return -1;
+    }
+
+}
+
+/* insertion for VEB
+assume non duplicate number inserted in range [0,u-1] */
+void veb_insert(VEB veb, int x) {
+    /* min and max both not set */
+    if (veb.min == -1) {
+        veb.min = x;
+        veb.max = x;
+        return;
+    }
+
+    /* min or max not set */
+    if (veb.min == veb.max) {
+        if (x > veb.min) {
+            veb.max = x;
+        } else {
+            veb.min = x;
+        }
+        return;
+    }
+
+    /* recursive cases */
+    if (x < veb.min) {
+        var old_min = veb.min;
+        veb.min = x;
+        x = old_min;
+    } else if (x > veb.max) {
+        var old_max = veb.max;
+        veb.max = x;
+        x = old_max;
+    }
+    var quo_rem = div_mod(x, sqrt_ceil(veb.u));
+    var h = quo_rem.quo;
+    var l = quo_rem.rem;
+
+    /* if this is first insert after min and max, then
+    we have more than 2 elements, so create aux */
+    if? (VEB auxillary = veb.aux) {
+
+    } else {
+        veb.aux = veb_init(sqrt_ceil(veb.u));
+    }
+
+    if? (VEB auxillary = veb.aux) {
+
+        /* if the child is empty, add it to aux */
+        if? (VEB ignore = veb.children[h]) {
+
+        } else {
+            veb.children[h] = veb_init(sqrt_ceil(veb.u));
+            veb_insert(auxillary, h);
+        }
+
+        /* now insert into veb.children[h] */
+        if? (VEB child = veb.children[h]) {
+            veb_insert(child, l);
+        } else {
+            print_string("Error insert: veb.children[h] can't be null but it is...");   
+        }
+
+    } else {
+        print_string("Error insert: Aux can't be null but it is...");
+    }
+
+    return;
+
+}
+
+/* sort array, assuming it has at least one element
+and array is all positive with no duplicates */
+int[] veb_sort(int[] a) {
+    var a_max = max(a);
+    var veb = veb_init(a_max + 1);
+    for(var i=0; i<length(a); i=i+1;) {
+        veb_insert(veb, a[i]);
+    }
+
+    var ans = new int[length(a)];
+    var curr = veb.max;
+    for(var i=0; i<length(ans); i=i+1;) {
+        ans[length(ans)-1-i] = curr;
+        curr = veb_pred(veb, curr-1);
+    }
+
+    if(curr != -1) {
+        print_string("Error veb_sort: curr is not -1 at the end, something went wrong\n");
+    }
+
+    return ans;
+}
+
+/* helper function to print array */
+void print_arr(int[] a) {
+    for(var i=0; i<length(a); i=i+1;) {
+        print_int(a[i]);
+        print_string(" ");
+    }
+    return;
+}
+
+
+int program(int argc, string[] argv) {
+
+    var test_case_num = argc;
+
+    if (test_case_num == 2) {
+        var ans = veb_sort(new int[20]{i -> i});
+        print_arr(ans);
+    }
+    if (test_case_num == 3) {
+        var ans = veb_sort(new int[20]{i -> 100-i});
+        print_arr(ans);
+    }
+    if (test_case_num == 4) {
+        var ans = veb_sort(new int[]{12, 5, 6, 8, 2, 4, 14, 0, 1, 9, 11, 13, 3, 7, 10});
+        print_arr(ans);
+    }
+
+
+    return 0;
+
+}
+
+
+
+/* Unit testing
+int program(int argc, string[] argv) {
+    var a = div_mod(10,3);
+    print_int(a.quo);
+    print_string(" ");
+    print_int(a.rem);
+    print_string("\n");
+
+    a = div_mod(140, 10);
+    print_int(a.quo);
+    print_string(" ");
+    print_int(a.rem);
+    print_string("\n");
+
+    var b = sqrt_ceil(50);
+    print_int(b);
+    print_string("\n");
+
+    b = sqrt_ceil(81);
+    print_int(b);
+    print_string("\n");
+
+    var c = max(new int[]{6});
+    print_int(c);
+    print_string("\n");
+    c = max(new int[10]{i -> (i+1)*(i+1)});
+    print_int(c);
+    print_string("\n");
+
+    var d = veb_init(20);
+    print_int(veb_pred(d, 5));  /* -1 */
+    print_string(" ");
+    veb_insert(d,10);
+    print_int(veb_pred(d, 5));  /* -1 */
+    print_string(" ");
+    print_int(veb_pred(d, 19)); /* 10 */
+    print_string(" ");
+    veb_insert(d,1);            /* 1 10 */
+    print_int(veb_pred(d, 5));  /* 1 */
+    print_string(" ");
+    veb_insert(d,3);
+    veb_insert(d,5);
+    veb_insert(d,7);            /* 1 3 5 7 10 */
+    print_int(veb_pred(d, 9));  /* 7 */
+    print_string(" ");
+    print_int(veb_pred(d, 5)); /* 5 */
+    print_string(" ");
+    print_string("\n");
+
+    var e = veb_sort(new int[20]{i -> i});
+    print_arr(e);
+
+    var f = veb_sort(new int[15]{i -> i});
+    print_arr(f);
+
+    var g = veb_sort(new int[17]{i -> i});
+    print_arr(g);
+
+    var h = veb_sort(new int[]{12, 5, 6, 8, 2, 4, 14, 0, 1, 9, 11, 13, 3, 7, 10});
+    print_arr(h);
+
+    return a.quo;
+}
+*/

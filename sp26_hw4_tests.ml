@@ -254,6 +254,38 @@ let yichi_zhang_unit_tests = [
       else ()))
 ]
 
+(* Hita Gupta's unit tests *)
+let hitagu_proj_ctxt =
+  Tctxt.empty
+  |> fun c -> Tctxt.add_struct c "Point"
+    Oat.Ast.[{fieldName = "x"; ftyp = TInt}; {fieldName = "y"; ftyp = TBool}]
+
+let hitagu_point_exp =
+  Oat.Ast.(no_loc @@ CStruct ("Point", 
+    [("x", no_loc @@ CInt 1L); ("y", no_loc @@ CBool true)]))
+
+let hitagu_tests = [
+  ("proj: ⊢ (new Point{x=1;y=true}).x : int",
+    (fun () ->
+      match
+        (try Some (Typechecker.typecheck_exp hitagu_proj_ctxt
+          Oat.Ast.(no_loc @@ Lhs (no_loc @@ Proj (hitagu_point_exp, "x"))))
+         with Typechecker.TypeError _ -> None)
+      with
+      | Some Oat.Ast.TInt -> ()
+      | Some _ -> failwith "expected TInt"
+      | None -> failwith "unexpected TypeError"))
+  ; ("proj negative: ⊢ (new Point{x=1;y=true}).z : TypeError",
+    (fun () ->
+      match
+        (try Some (Typechecker.typecheck_exp hitagu_proj_ctxt
+          Oat.Ast.(no_loc @@ Lhs (no_loc @@ Proj (hitagu_point_exp, "z"))))
+         with Typechecker.TypeError _ -> None)
+      with
+      | None -> ()
+      | Some _ -> failwith "expected TypeError for unknown field"))
+]
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -265,7 +297,8 @@ let all_student_unit_tests =
   raheem_unit_test @
   will_grace_unit_tests @
   colin_jishnu_tests @
-  yichi_zhang_unit_tests
+  yichi_zhang_unit_tests @
+  hitagu_tests
 
 let rec n_ones n =
   match n with
@@ -327,7 +360,7 @@ let student_complex_tests : (string * string * string) list = [
     ("linked_list.oat", "1", "9 6 5 5 4 3 3 2 1 1\n0");
     ("linked_list.oat", "2", "2 2 4 6 6 8 10 10 12 18\n0");
     ("linked_list.oat", "3", "2 4 6\n0");
-    ("linked_list.oat", "4", "39\n39");
+    ("linked_list.oat", "4", "39\n0");
     ("linked_list.oat", "5", "0 1 1 2 3 3 4 5 5 6 7 8 9\n0");
     ("linked_list.oat", "6", "9 6 5 5 4 3 3 2 1 1\n0");
 
@@ -347,5 +380,10 @@ let student_complex_tests : (string * string * string) list = [
 
     (* Daniel Yang (yanda-hw4) *)
     ("trie.oat", "", "8 4 1 0 1 0 6 6 5 4 0 0");
-    ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10")
+    ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10");
+    
+    (* Arnav_john Test Case *)
+    ("VEB_Sort.oat", "2", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19");
+    ("VEB_Sort.oat", "3 3", "81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100");
+    ("VEB_Sort.oat", "4 4 4", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14")
 ]
