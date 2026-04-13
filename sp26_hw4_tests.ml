@@ -261,7 +261,7 @@ let hitagu_proj_ctxt =
     Oat.Ast.[{fieldName = "x"; ftyp = TInt}; {fieldName = "y"; ftyp = TBool}]
 
 let hitagu_point_exp =
-  Oat.Ast.(no_loc @@ CStruct ("Point", 
+  Oat.Ast.(no_loc @@ CStruct ("Point",
     [("x", no_loc @@ CInt 1L); ("y", no_loc @@ CBool true)]))
 
 let hitagu_tests = [
