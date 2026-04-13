@@ -67,7 +67,7 @@ let ai_test_neg = Oat.Ast.(
 )
 
 let ai_run_test (e:Oat.Ast.exp Oat.Ast.node) : bool =
-  try 
+  try
     let ty = Typechecker.typecheck_exp Tctxt.empty e in
     (ty = Oat.Ast.(TRef(RArray(TInt))))
   with Typechecker.TypeError _ -> false
@@ -77,7 +77,7 @@ let ayush_isaac_test = [
     (fun () ->
         if ai_run_test ai_test_pos then ()
         else failwith "should not fail"))
-  ; ("TYP_NEWARRAYINIT negative: ⊢ new int[5]{x -> true} : TypeError", 
+  ; ("TYP_NEWARRAYINIT negative: ⊢ new int[5]{x -> true} : TypeError",
       (fun () ->
         if ai_run_test ai_test_neg then failwith "should not pass"
         else ()
@@ -113,14 +113,15 @@ let googlers_tests = [
       with Typechecker.TypeError _ -> ()))
 ]
 
+(* Arnav Ambre and John Wu's tests below *)
 let arnav_john_unit_tests = [
-  "subtype func: |- (int, bool) -> bool <: (int, bool) -> bool",
+  "subtype func: |- (int, int) -> bool <: (int, int) -> bool",
    (fun () ->
-       if Typechecker.subtype_func (Tctxt.empty) ([TInt; TInt], (RetVal TBool)) ([TInt; TInt], (RetVal TBool)) then ()
+       if Typechecker.subtype_func (Tctxt.empty) [TInt; TInt] (RetVal TBool) [TInt; TInt] (RetVal TBool) then ()
        else failwith "should not fail")
-; ("no subtype func: |- int <: bool",
+; ("no subtype func: |- (int, int) -> bool <: (bool, int) -> int",
    (fun () ->
-       if Typechecker.subtype_func Tctxt.empty ([TInt; TInt], (RetVal TBool)) ([TBool; TInt], (RetVal TInt)) then
+       if Typechecker.subtype_func Tctxt.empty [TInt; TInt] (RetVal TBool) [TBool; TInt] (RetVal TInt) then
          failwith "should not succeed" else ())
   )
 ]
@@ -175,7 +176,7 @@ let raheem_unit_test = [
        then () else failwith "should not fail")
    ; ("no subtype: |- string[] </: string?[]",
    (fun () ->
-       if Typechecker.subtype Tctxt.empty 
+       if Typechecker.subtype Tctxt.empty
            (TRef (RArray (TRef RString))) (TRef (RArray (TNullRef RString)))
        then failwith "should not succeed" else ())
   )
@@ -215,22 +216,22 @@ let will_grace_unit_tests = [
     ))
 ]
 
-let colin_jishnu_tests = 
+let colin_jishnu_tests =
   [ ("typ_bop: ⊢ 0+1: int",
-    fun () -> 
-      let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CInt 0L)), (no_loc (CInt 1L))))) in 
+    fun () ->
+      let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CInt 0L)), (no_loc (CInt 1L))))) in
       if Typechecker.typecheck_exp Tctxt.empty exp = TInt then () else failwith "should succeed"
     );
     ("typ_intOps Negative: ⊢ false+1: TypeError",
-      fun () -> 
-        let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CBool false)), (no_loc (CInt 1L))))) in 
+      fun () ->
+        let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CBool false)), (no_loc (CInt 1L))))) in
         try
           let _ = Typechecker.typecheck_exp Tctxt.empty exp in
           failwith "Should fail"
         with
         | Typechecker.TypeError _ -> ()
         | _ -> failwith "exception other than TypeError"
-    ) 
+    )
   ]
 ;;
 
