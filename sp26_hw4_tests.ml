@@ -359,7 +359,7 @@ let student_complex_tests : (string * string * string) list = [
     ("linked_list.oat", "1", "9 6 5 5 4 3 3 2 1 1\n0");
     ("linked_list.oat", "2", "2 2 4 6 6 8 10 10 12 18\n0");
     ("linked_list.oat", "3", "2 4 6\n0");
-    ("linked_list.oat", "4", "39\n39");
+    ("linked_list.oat", "4", "39\n0");
     ("linked_list.oat", "5", "0 1 1 2 3 3 4 5 5 6 7 8 9\n0");
     ("linked_list.oat", "6", "9 6 5 5 4 3 3 2 1 1\n0");
 
