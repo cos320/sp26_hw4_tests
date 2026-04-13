@@ -212,7 +212,7 @@ int program(int argc, string[] argv) {
   var asc = list_sort(base, fn_asc);
   var mode = 0;
   if (argc >= 2) {
-    mode = parse_arg(argv[1]);
+    mode = string_to_int(argv[1])
   }
 
   /* sort ascending */
