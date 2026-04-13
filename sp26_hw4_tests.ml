@@ -329,7 +329,7 @@ let student_complex_tests : (string * string * string) list = [
     ("linked_list.oat", "3", "2 4 6\n0");
     ("linked_list.oat", "4", "39\n39");
     ("linked_list.oat", "5", "0 1 1 2 3 3 4 5 5 6 7 8 9\n0");
-    ("linked_list.oat", "6", "9 6 5 5 4 3 3 2 1 1\n0")
+    ("linked_list.oat", "6", "9 6 5 5 4 3 3 2 1 1\n0");
 
     (* Raheem's complex test, implements Stalin Sort with Linked List *)
     (* See here: https://www.reddit.com/r/ProgrammerHumor/comments/9s9kgn/ *)
@@ -338,7 +338,7 @@ let student_complex_tests : (string * string * string) list = [
     ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
 
     ("will_grace_nodes.oat", "", "6");
-    ("colin_jishnu.oat", "", "(4 (1 null null) (9 null null))\n 0");
+    ("colin_jishnu.oat", "", "(4 (1 null null) (9 null null))\n0");
 
     (* Isaac and Ayush *)
     ("hash_table_word_counter.oat", "Im " ^ ai_text2, "There were 2 occurences of the word Im.0");
