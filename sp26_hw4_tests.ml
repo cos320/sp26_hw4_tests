@@ -85,8 +85,32 @@ let ayush_isaac_test = [
 ]
 
 (* Ben Aepli and Vedant Badoni's tests. *)
+let googlers_struct_ctxt =
+  Tctxt.empty
+  |> fun c ->
+  Tctxt.add_struct c "point"
+    Oat.Ast.[ { fieldName = "x"; ftyp = TInt }; { fieldName = "y"; ftyp = TInt } ]
+
 let googlers_tests = [
-  (* TODO *)
+  ("typecheck CStruct: can have fields in diff order",
+    (fun () ->
+      let e = Oat.Ast.(no_loc @@ CStruct ("point", [
+        ("y", no_loc @@ CInt 7L);
+        ("x", no_loc @@ CInt 3L)
+      ])) in
+      let t = Typechecker.typecheck_exp googlers_struct_ctxt e in
+      if t = Oat.Ast.(TRef (RStruct "point")) then ()
+      else failwith "should typecheck to TRef"))
+; ("typecheck CStruct: wrong field type is rejected",
+    (fun () ->
+      let e = Oat.Ast.(no_loc @@ CStruct ("point", [
+        ("x", no_loc @@ CInt 3L);
+        ("y", no_loc @@ CBool true)
+      ])) in
+      try
+        let _ = Typechecker.typecheck_exp googlers_struct_ctxt e in
+        failwith "should not pass"
+      with Typechecker.TypeError _ -> ()))
 ]
 
 let arnav_john_unit_tests = [
