@@ -42,6 +42,47 @@ let example_unit_tests2 = [
   )
 ]
 
+(* Ayush Isaac (ai) Tests *)
+let idx = "x"
+let ai_test_pos = Oat.Ast.(
+  no_loc @@ NewArrInit (
+    TInt,
+    no_loc @@ CInt 5L,
+    idx,
+    no_loc @@ Bop (
+      Add,
+      no_loc @@ Lhs(no_loc @@ Id idx),
+      no_loc @@ CInt 1L
+    )
+  )
+)
+
+let ai_test_neg = Oat.Ast.(
+  no_loc @@ NewArrInit (
+    TInt,
+    no_loc @@ CInt 5L,
+    idx,
+    no_loc @@ CBool true
+  )
+)
+
+let ai_run_test (e:Oat.Ast.exp Oat.Ast.node) : bool =
+  try 
+    let ty = Typechecker.typecheck_exp Tctxt.empty e in
+    (ty = Oat.Ast.(TRef(RArray(TInt))))
+  with
+  | Typechecker.TypeError _ -> false
+
+let ayush_isaac_test = [
+  ("TYP_NEWARRAYINIT: H;G;L ⊢ new t[exp1]{x -> exp2} : t[]",
+    (fun () ->
+    if ai_run_test ai_test_pos then ()
+    else failwith "should not fail"))
+  ; ("TYP_NEWARRAYINIT: negative test", (fun () ->
+    if ai_run_test ai_test_neg then failwith "should not pass"
+    else ()
+    ))
+]
 
 (* Ben Aepli and Vedant Badoni's tests. *)
 let googlers_tests = [
@@ -65,7 +106,8 @@ let all_student_unit_tests =
   example_unit_tests1 @
   example_unit_tests2 @
   googlers_tests @
-  arnav_john_unit_tests
+  arnav_john_unit_tests @
+  ayush_isaac_test
 
 let rec n_ones n =
   match n with
