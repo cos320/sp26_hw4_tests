@@ -379,5 +379,10 @@ let student_complex_tests : (string * string * string) list = [
 
     (* Daniel Yang (yanda-hw4) *)
     ("trie.oat", "", "8 4 1 0 1 0 6 6 5 4 0 0");
-    ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10")
+    ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10");
+    
+    (* Arnav_john Test Case *)
+    ("VEB_Sort.oat", "2", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19");
+    ("VEB_Sort.oat", "3 3", "81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100");
+    ("VEB_Sort.oat", "4 4 4", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14")
 ]
