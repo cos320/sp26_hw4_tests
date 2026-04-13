@@ -1,0 +1,66 @@
+/* Implement map over a binary tree */
+
+struct Node {
+    int value;
+    Node? left;
+    Node? right
+}
+
+Node? map_tree(Node? t, (int) -> int f) {
+    if?(Node n = t) {
+        var mapped = new Node {value = f(n.value); left = Node null; right = Node null};
+        if?(Node l = n.left) {
+           mapped.left = map_tree(l,f);
+        } 
+        if?(Node r = n.right) {
+            mapped.right = map_tree(r,f);
+        }
+        return mapped;
+    }
+    return Node null;
+}
+
+
+int square(int x) {
+    return x * x;
+}
+
+void print_tree(Node? t) {
+    if?(Node n = t) {
+        print_string("(");
+        print_int(n.value);
+        print_string(" ");
+        print_tree(n.left);
+        print_string(" ");
+        print_tree(n.right);
+        print_string(")");
+    } else {
+        print_string("null");
+    }
+    return;
+}
+
+
+int program(int argc, string[] argv) {
+    var leaf1 = new Node {
+        value = 1;
+        left = Node null;
+        right = Node null
+    };
+    var leaf3 = new Node {
+        value = 3;
+        left = Node null;
+        right = Node null
+    };
+    var root = new Node {
+        value = 2;
+        left = leaf1;
+        right = leaf3
+    };
+
+    var mapped = map_tree(root, square);
+    print_tree(mapped);
+    print_string("\n");
+
+    return 0;
+}

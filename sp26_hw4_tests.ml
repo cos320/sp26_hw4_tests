@@ -235,6 +235,25 @@ let colin_jishnu_tests =
   ]
 ;;
 
+(* Team whycantiuseapreviousteamname - Yichi Zhang tests *)
+let yichi_zhang_unit_tests = [
+  ("subtype fptr: |- (string?) -> string <: (string) -> string?",
+   (fun () ->
+      let open Oat.Ast in
+      let t1 = TRef (RFun ([TNullRef RString], RetVal (TRef RString))) in
+      let t2 = TRef (RFun ([TRef RString], RetVal (TNullRef RString))) in
+      if Typechecker.subtype Tctxt.empty t1 t2 then ()
+      else failwith "should not fail"));
+  ("no subtype fptr: |- (string) -> string? </: (string?) -> string",
+   (fun () ->
+      let open Oat.Ast in
+      let t1 = TRef (RFun ([TRef RString], RetVal (TNullRef RString))) in
+      let t2 = TRef (RFun ([TNullRef RString], RetVal (TRef RString))) in
+      if Typechecker.subtype Tctxt.empty t1 t2 then
+        failwith "should not succeed"
+      else ()))
+]
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -245,7 +264,8 @@ let all_student_unit_tests =
   yanda_tests @
   raheem_unit_test @
   will_grace_unit_tests @
-  colin_jishnu_tests
+  colin_jishnu_tests @
+  yichi_zhang_unit_tests
 
 let rec n_ones n =
   match n with
@@ -292,12 +312,24 @@ let bplus_tree_expected_4_128 = "quarter:\nx: -32y: 32z: -32\nthree quarters:\nx
 let bplus_tree_expected_8_2048 = "quarter:\nx: -512y: 512z: -512\nthree quarters:\nx: 1536y: -1536z: 1536\n 0"
 let bplus_tree_expected_128_64 = "quarter:\nx: -16y: 16z: -16\nthree quarters:\nx: 48y: -48z: 48\n 0"
 
+(* Ayush Isaac complex tests *)
+let ai_text1 = "sigma sigma on the wall who’s the skibidiest of them all you are you are yes you are "
+let ai_text2 = "Im over here taking a nap rn I got a pillow under my head rn sleeping so soundly Im a snoozer man"
+
 let student_complex_tests : (string * string * string) list = [
     ("demo_color.oat", "", "20");
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 4) (n_ones 128), bplus_tree_expected_4_128);
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 8) (n_ones 2048), bplus_tree_expected_8_2048);
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 128) (n_ones 64), bplus_tree_expected_128_64);
 
+    (* Hita Gupta's tests *)
+    ("linked_list.oat", "",  "1 1 2 3 3 4 5 5 6 9\n0");
+    ("linked_list.oat", "1", "9 6 5 5 4 3 3 2 1 1\n0");
+    ("linked_list.oat", "2", "2 2 4 6 6 8 10 10 12 18\n0");
+    ("linked_list.oat", "3", "2 4 6\n0");
+    ("linked_list.oat", "4", "39\n39");
+    ("linked_list.oat", "5", "0 1 1 2 3 3 4 5 5 6 7 8 9\n0");
+    ("linked_list.oat", "6", "9 6 5 5 4 3 3 2 1 1\n0")
 
     (* Raheem's complex test, implements Stalin Sort with Linked List *)
     (* See here: https://www.reddit.com/r/ProgrammerHumor/comments/9s9kgn/ *)
@@ -305,5 +337,15 @@ let student_complex_tests : (string * string * string) list = [
     ("stalin_sort.oat", "1 2 3 4 5", "1 2 3 4 5 0");
     ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
 
-    ("will_grace_nodes.oat", "", "6")
+    ("will_grace_nodes.oat", "", "6");
+    ("colin_jishnu.oat", "", "(4 (1 null null) (9 null null))\n 0");
+
+    (* Isaac and Ayush *)
+    ("hash_table_word_counter.oat", "Im " ^ ai_text2, "There were 2 occurences of the word Im.0");
+    ("hash_table_word_counter.oat", "you " ^ ai_text1, "There were 3 occurences of the word you.0");
+    ("hash_table_word_counter.oat", "are " ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1, "There were 18 occurences of the word are.0");
+
+    (* Daniel Yang (yanda-hw4) *)
+    ("trie.oat", "", "8 4 1 0 1 0 6 6 5 4 0 0");
+    ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10")
 ]

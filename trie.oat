@@ -1,0 +1,133 @@
+/* Daniel Yang (yanda-hw4)
+   trie (prefix tree)      */
+
+struct TrieNode {
+    bool is_end;
+    TrieNode?[] children
+}
+
+TrieNode new_node() {
+    var ch = new (TrieNode?)[26];
+    return new TrieNode { is_end = false; children = ch };
+}
+
+void insert(TrieNode root, int[] word) {
+    var cur = root;
+    for (var i = 0; i < length(word); i = i + 1;) {
+        var idx = word[i];
+        if?(TrieNode child = cur.children[idx]) {
+            cur = child;
+        } else {
+            var nn = new_node();
+            cur.children[idx] = nn;
+            cur = nn;
+        }
+    }
+    cur.is_end = true;
+    return;
+}
+
+int search(TrieNode root, int[] word) {
+    var cur = root;
+    for (var i = 0; i < length(word); i = i + 1;) {
+        var idx = word[i];
+        if?(TrieNode child = cur.children[idx]) {
+            cur = child;
+        } else {
+            return 0;
+        }
+    }
+    if (cur.is_end) { return 1; }
+    return 0;
+}
+
+bool has_no_children(TrieNode node) {
+    for (var i = 0; i < 26; i = i + 1;) {
+        if?(TrieNode child = node.children[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool delete(TrieNode node, int[] word, int depth) {
+    if (depth == length(word)) {
+        if (!(node.is_end)) { return false; }
+        node.is_end = false;
+        return has_no_children(node);
+    }
+    var idx = word[depth];
+    if?(TrieNode child = node.children[idx]) {
+        var should_delete = delete(child, word, depth + 1);
+        if (should_delete) {
+            node.children[idx] = TrieNode null;
+            if (!(node.is_end)) {
+                return has_no_children(node);
+            }
+        }
+        return false;
+    }
+    return false;
+}
+
+int count_if(TrieNode node, (TrieNode) -> bool fun) {
+    var total = 0;
+    if (fun(node)) {
+        total = total + 1;
+    }
+    for (var i = 0; i < 26; i = i + 1;) {
+        if?(TrieNode child = node.children[i]) {
+            total = total + count_if(child, fun);
+        }
+    }
+    return total;
+}
+
+bool is_word_end(TrieNode n) {
+    return n.is_end;
+}
+
+bool is_inner(TrieNode n) {
+    return !(n.is_end);
+}
+
+void print_ints(int[] arr) {
+    for (var i = 0; i < length(arr); i = i + 1;) {
+        print_int(arr[i]);
+        print_string(" ");
+    }
+    return;
+}
+
+int program(int argc, string[] argv) {
+    var root = new_node();
+    /* insert "a", "too", "tea", "ted", "ten", "i", "in", "inn" */
+    insert(root, new int[]{0});
+    insert(root, new int[]{19, 14, 14});
+    insert(root, new int[]{19, 4, 0});
+    insert(root, new int[]{19, 4, 3});
+    insert(root, new int[]{19, 4, 13});
+    insert(root, new int[]{8});
+    insert(root, new int[]{8, 13});
+    insert(root, new int[]{8, 13, 13});
+
+    var words = count_if(root, is_word_end);               /* 8 words inserted */
+    var inner = count_if(root, is_inner);                  /* 4 inner nodes: "", "t", "to", "te" */
+    var s1 = search(root, new int[]{8, 13});               /* found "in": 1 */
+    var s2 = search(root, new int[]{19});                  /* "t" is prefix only: 0 */
+    var s3 = search(root, new int[]{19, 4, 3});            /* found "ted": 1 */
+    var s4 = search(root, new int[]{1, 0, 13, 0, 13, 0});  /* never inserted "banana": 0 */
+
+    var b1 = delete(root, new int[]{8}, 0);
+    var b2 = delete(root, new int[]{8, 13}, 0);
+    var words_2 = count_if(root, is_word_end);             /* 6 words left */
+    var inner_2 = count_if(root, is_inner);                /* 4 + 2 new inner nodes ("i", "in") */
+    
+    var b3 = delete(root, new int[]{8, 13, 13}, 0);
+    var words_3 = count_if(root, is_word_end);             /* 5 words left */
+    var inner_3 = count_if(root, is_inner);                /* 6 - 2 inner nodes pruned ("i", "in") */
+    var s5 = search(root, new int[]{8, 13});               /* deleted "in": 0 */
+
+    print_ints(new int[]{words, inner, s1, s2, s3, s4, words_2, inner_2, words_3, inner_3, s5});
+    return 0;
+}
