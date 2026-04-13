@@ -1,0 +1,53 @@
+/* Yichi Zhang complex test */
+
+struct Node {
+  int value;
+  Node? next;
+  (int) -> int show
+}
+
+int id(int x) {
+  return x;
+}
+
+Node? reverse(Node? head) {
+  var prev = Node null;
+  var cur = head;
+  while (true) {
+    if? (Node c = cur) {
+      var nxt = c.next;
+      c.next = prev;
+      prev = c;
+      cur = nxt;
+    } else {
+      return prev;
+    }
+  }
+}
+
+int print_and_sum(Node? head) {
+  var cur = head;
+  var sum = 0;
+  while (true) {
+    if? (Node c = cur) {
+      var shown = c.show(c.value);
+      print_int(shown);
+      print_string(" ");
+      sum = sum + shown;
+      cur = c.next;
+    } else {
+      return sum;
+    }
+  }
+}
+
+int program(int argc, string[] argv) {
+  var n0 = Node null;
+  var n4 = new Node { value = 4; next = n0; show = id };
+  var n3 = new Node { value = 3; next = n4; show = id };
+  var n2 = new Node { value = 2; next = n3; show = id };
+  var n1 = new Node { value = 1; next = n2; show = id };
+
+  var rev = reverse(n1);
+  return print_and_sum(rev);
+}

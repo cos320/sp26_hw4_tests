@@ -234,6 +234,25 @@ let colin_jishnu_tests =
   ]
 ;;
 
+(* Team whycantiuseapreviousteamname - Yichi Zhang tests *)
+let yichi_zhang_unit_tests = [
+  ("subtype fptr: |- (string?) -> string <: (string) -> string?",
+   (fun () ->
+      let open Oat.Ast in
+      let t1 = TRef (RFun ([TNullRef RString], RetVal (TRef RString))) in
+      let t2 = TRef (RFun ([TRef RString], RetVal (TNullRef RString))) in
+      if Typechecker.subtype Tctxt.empty t1 t2 then ()
+      else failwith "should not fail"));
+  ("no subtype fptr: |- (string) -> string? </: (string?) -> string",
+   (fun () ->
+      let open Oat.Ast in
+      let t1 = TRef (RFun ([TRef RString], RetVal (TNullRef RString))) in
+      let t2 = TRef (RFun ([TNullRef RString], RetVal (TRef RString))) in
+      if Typechecker.subtype Tctxt.empty t1 t2 then
+        failwith "should not succeed"
+      else ()))
+]
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -244,7 +263,8 @@ let all_student_unit_tests =
   yanda_tests @
   raheem_unit_test @
   will_grace_unit_tests @
-  colin_jishnu_tests
+  colin_jishnu_tests @
+  yichi_zhang_unit_tests
 
 let rec n_ones n =
   match n with
@@ -314,4 +334,5 @@ let student_complex_tests : (string * string * string) list = [
     ("hash_table_word_counter.oat", "you " ^ ai_text1, "There were 3 occurences of the word you.0");
     ("hash_table_word_counter.oat", "are " ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1, "There were 18 occurences of the word are.0");
 
+    ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10")
 ]
