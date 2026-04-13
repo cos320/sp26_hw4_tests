@@ -1,0 +1,262 @@
+/* Hita Gupta */
+/* Implements a linked list and various functions */
+
+struct Node {
+    int val;
+    Node? next
+}
+
+struct List {
+    Node? head;
+    int size
+}
+
+/* create a new list */
+List list_new() {
+    return new List {head = Node null; size = 0};
+}
+
+/* add a value to the front of the list */
+List list_add(List l, int v) {
+    var n = new Node {val = v; next = l.head};
+    return new List {head = n; size = l.size+1};
+}
+
+/* create a new list from an array */
+List list_from_array(int[] arr) {
+  var l = list_new();
+  for (var i = length(arr) - 1; i >= 0; i = i - 1;) {
+    l = list_add(l, arr[i]);
+  }
+  return l;
+}
+
+/* return the head value of the list, or -1 if empty */
+int list_head(List l) {
+  if?(Node n = l.head) {
+    return n.val;
+  }
+  return 0 - 1;
+}
+
+/* return a new list in reverse order */
+List list_reverse(List l) {
+  var acc = list_new();
+  var cur = l.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      acc = list_add(acc, n.val);
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  return acc;
+}
+
+/* return a new list with applied f to every element */
+List list_map(List l, (int) -> int f) {
+  var acc = list_new();
+  var cur = l.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      acc = list_add(acc, f(n.val));
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  return list_reverse(acc);
+}
+
+/* return the subset of elements for which f is true */
+List list_filter(List l, (int) -> bool f) {
+  var acc = list_new();
+  var cur = l.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      if (f(n.val)) {
+        acc = list_add(acc, n.val);
+      }
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  return list_reverse(acc);
+}
+
+/* fold the list from left to right */
+int list_fold(List l, (int, int) -> int f, int seed) {
+  var acc = seed;
+  var cur = l.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      acc = f(acc, n.val);
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  return acc;
+}
+
+/* add the elements of b after the elements of a and return the new list */
+List list_concat(List a, List b) {
+  var ra = list_reverse(a);
+  var result = b;
+  var cur = ra.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      result = list_add(result, n.val);
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  return result;
+}
+
+/* insert v into the sorted list, using the comparator cmp */
+List list_sorted_insert(List l, int v, (int, int) -> int cmp) {
+  var before = list_new();
+  var after  = list_new();
+  var cur = l.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      if (cmp(n.val, v) <= 0) {
+        before = list_add(before, n.val);
+      } else {
+        after = list_add(after, n.val);
+      }
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  var sorted_before = list_reverse(before);
+  var sorted_after  = list_reverse(after);
+  var mid = list_add(sorted_after, v);
+  return list_concat(sorted_before, mid);
+}
+
+/* sort a list using the comparator cmp */
+List list_sort(List l, (int, int) -> int cmp) {
+  var sorted = list_new();
+  var cur = l.head;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      sorted = list_sorted_insert(sorted, n.val, cmp);
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  return sorted;
+}
+
+/* print a list */
+void list_print(List l) {
+  var cur = l.head;
+  var first = true;
+  var done = false;
+  while (!done) {
+    if?(Node n = cur) {
+      if (!first) { print_string(" "); }
+      print_int(n.val);
+      first = false;
+      cur = n.next;
+    } else {
+      done = true;
+    }
+  }
+  print_string("\n");
+  return;
+}
+
+/* some helper functions for testing */
+int fn_add(int a, int b) {
+    return a + b;
+}
+
+int fn_mul(int a, int b) {
+    return a * b;
+}
+
+int fn_double(int x) {
+    return x * 2;
+}
+
+int fn_asc(int a, int b) {
+    return a - b;
+}
+
+int fn_desc(int a, int b) {
+    return b - a;
+}
+
+bool fn_is_even(int x) {
+    return (x [&] 1) == 0;
+}
+
+
+int program(int argc, string[] argv) {
+  var base = list_from_array(new int[]{3, 1, 4, 1, 5, 9, 2, 6, 5, 3});
+  var asc = list_sort(base, fn_asc);
+  var mode = 0;
+  if (argc >= 2) {
+    mode = parse_arg(argv[1]);
+  }
+
+  /* sort ascending */
+  if (mode == 0) {
+    list_print(asc);
+    return 0;
+  }
+
+  /* sort descending */
+  if (mode == 1) {
+    list_print(list_sort(base, fn_desc));
+    return 0;
+  }
+
+  /* map */
+  if (mode == 2) {
+    list_print(list_map(asc, fn_double));
+    return 0;
+  }
+
+  /* filter */
+  if (mode == 3) {
+    list_print(list_filter(asc, fn_is_even));
+    return 0;
+  }
+
+  /* fold (sum) */
+  if (mode == 4) {
+    var total = list_fold(asc, fn_add, 0);
+    print_int(total);
+    print_string("\n");
+    return total;
+  }
+
+  /* concat */
+  if (mode == 5) {
+    var extra = list_from_array(new int[]{7, 0, 8});
+    var combined = list_sort(list_concat(base, extra), fn_asc);
+    list_print(combined);
+    return 0;
+  }
+
+  /* reverse */
+  var rev = list_reverse(asc);
+  list_print(rev);
+  return 0;
+}
