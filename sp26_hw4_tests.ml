@@ -191,6 +191,25 @@ let will_grace_unit_tests = [
     ))
 ]
 
+let colin_jishnu_tests = 
+  [ ("typ_bop: ⊢ 0+1: int",
+    fun () -> 
+      let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CInt 0L)), (no_loc (CInt 1L))))) in 
+      if Typechecker.typecheck_exp Tctxt.empty exp = TInt then () else failwith "should succeed"
+    );
+    ("typ_intOps Negative: ⊢ false+1: TypeError",
+      fun () -> 
+        let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CBool false)), (no_loc (CInt 1L))))) in 
+        try
+          let _ = Typechecker.typecheck_exp Tctxt.empty exp in
+          failwith "Should fail"
+        with
+        | Typechecker.TypeError _ -> ()
+        | _ -> failwith "exception other than TypeError"
+    ) 
+  ]
+;;
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -200,7 +219,8 @@ let all_student_unit_tests =
   ayush_isaac_test @
   yanda_tests @
   raheem_unit_test @
-  will_grace_unit_tests
+  will_grace_unit_tests @
+  colin_jishnu_tests
 
 let rec n_ones n =
   match n with
