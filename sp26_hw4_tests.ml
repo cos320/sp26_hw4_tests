@@ -92,11 +92,11 @@ let googlers_tests = [
 let arnav_john_unit_tests = [
   "subtype func: |- (int, bool) -> bool <: (int, bool) -> bool",
    (fun () ->
-       if Typechecker.subtype_func (Tctxt.empty) [TInt; TInt] (RetVal TBool) [TInt; TInt] (RetVal TBool) then ()
+       if Typechecker.subtype_func (Tctxt.empty) ([TInt; TInt], (RetVal TBool)) ([TInt; TInt], (RetVal TBool)) then ()
        else failwith "should not fail")
 ; ("no subtype func: |- int <: bool",
    (fun () ->
-       if Typechecker.subtype_func Tctxt.empty [TInt; TInt] (RetVal TBool) [TBool; TInt] (RetVal TInt) then
+       if Typechecker.subtype_func Tctxt.empty ([TInt; TInt], (RetVal TBool)) ([TBool; TInt], (RetVal TInt)) then
          failwith "should not succeed" else ())
   )
 ]
@@ -142,6 +142,21 @@ let yanda_tests =
   ]
 ;;
 
+(* Raheem ( nico-nico-nii ) unit tests *)
+let raheem_unit_test = [
+  "subtype: |- string[] <: string[]",
+   (fun () ->
+       if Typechecker.subtype Tctxt.empty
+           (TRef (RArray (TRef RString))) (TRef (RArray (TRef RString)))
+       then () else failwith "should not fail")
+   ; ("no subtype: |- string[] </: string?[]",
+   (fun () ->
+       if Typechecker.subtype Tctxt.empty 
+           (TRef (RArray (TRef RString))) (TRef (RArray (TNullRef RString)))
+       then failwith "should not succeed" else ())
+  )
+]
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -149,7 +164,8 @@ let all_student_unit_tests =
   googlers_tests @
   arnav_john_unit_tests @
   ayush_isaac_test @
-  yanda_tests
+  yanda_tests @
+  raheem_unit_test
 
 let rec n_ones n =
   match n with
@@ -200,5 +216,12 @@ let student_complex_tests : (string * string * string) list = [
     ("demo_color.oat", "", "20");
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 4) (n_ones 128), bplus_tree_expected_4_128);
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 8) (n_ones 2048), bplus_tree_expected_8_2048);
-    ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 128) (n_ones 64), bplus_tree_expected_128_64)
+    ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 128) (n_ones 64), bplus_tree_expected_128_64);
+
+
+    (* Raheem's complex test, implements Stalin Sort with Linked List *)
+    (* See here: https://www.reddit.com/r/ProgrammerHumor/comments/9s9kgn/ *)
+    ("stalin_sort.oat", "6 1 55 0 60 450 3", "6 55 60 450 0");
+    ("stalin_sort.oat", "1 2 3 4 5", "1 2 3 4 5 0");
+    ("stalin_sort.oat", "69 68 67 67 67 67", "69 0")
 ]

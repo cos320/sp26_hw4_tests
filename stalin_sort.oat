@@ -1,0 +1,78 @@
+struct Elem {
+    int value;
+    Elem? next;
+    Elem? back
+}
+
+int string_to_int (string s) {
+    var string_array = array_of_string(s);
+    var res = 0;
+    var zeros = 1;
+    for (var i = length(string_array) - 1; i >= 0; i = i - 1;) {
+        var value = string_array[i] - 48;
+        res = res + (value * zeros);
+        zeros = zeros * 10;
+    }
+    return res;
+}
+
+void print_linked_list (Elem start) {
+    var current = start;
+    while (true) {
+        print_int(current.value);
+        print_string(" ");
+
+        if?(Elem next = current.next) {
+            current = next;
+        } else {
+            print_string("\n");
+            return;
+        }
+    }
+    print_string("\n");
+    return;
+}
+
+void stalin_sort (Elem start) {
+    var current = start;
+    var max_so_far = 0;
+    while (true) {
+        if (current.value < max_so_far) {
+            if?(Elem next = current.next) {
+                next.back = current.back;
+            }
+            if?(Elem back = current.back) {
+                    back.next = current.next;
+            }
+        } else {
+            max_so_far = current.value;
+        }
+
+        if?(Elem next = current.next) {
+            current = next;
+        } else {
+            return;
+        }
+    }
+    return;
+}
+
+int program (int argc, string[] argv) {
+    var n = argc-1;
+    var input = new int[n]{i -> string_to_int(argv[i+1])};
+    var linked_list = new Elem[n]{i -> new Elem { value = input[i]; next = Elem null; back = Elem null }};
+    for (var i = 1; i < n-1; i = i + 1;) {
+        linked_list[i].next = linked_list[i+1];
+        linked_list[i].back = linked_list[i-1];
+    }
+    
+    if (n > 1) {
+        linked_list[0].next = linked_list[1];
+        linked_list[n-1].back = linked_list[n-2];
+    }
+
+    stalin_sort(linked_list[0]);
+    print_linked_list(linked_list[0]);
+
+    return 0;
+}
