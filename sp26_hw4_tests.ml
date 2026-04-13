@@ -85,18 +85,42 @@ let ayush_isaac_test = [
 ]
 
 (* Ben Aepli and Vedant Badoni's tests. *)
+let googlers_struct_ctxt =
+  Tctxt.empty
+  |> fun c ->
+  Tctxt.add_struct c "point"
+    Oat.Ast.[ { fieldName = "x"; ftyp = TInt }; { fieldName = "y"; ftyp = TInt } ]
+
 let googlers_tests = [
-  (* TODO *)
+  ("typecheck CStruct: can have fields in diff order",
+    (fun () ->
+      let e = Oat.Ast.(no_loc @@ CStruct ("point", [
+        ("y", no_loc @@ CInt 7L);
+        ("x", no_loc @@ CInt 3L)
+      ])) in
+      let t = Typechecker.typecheck_exp googlers_struct_ctxt e in
+      if t = Oat.Ast.(TRef (RStruct "point")) then ()
+      else failwith "should typecheck to TRef"))
+; ("typecheck CStruct: wrong field type is rejected",
+    (fun () ->
+      let e = Oat.Ast.(no_loc @@ CStruct ("point", [
+        ("x", no_loc @@ CInt 3L);
+        ("y", no_loc @@ CBool true)
+      ])) in
+      try
+        let _ = Typechecker.typecheck_exp googlers_struct_ctxt e in
+        failwith "should not pass"
+      with Typechecker.TypeError _ -> ()))
 ]
 
 let arnav_john_unit_tests = [
   "subtype func: |- (int, bool) -> bool <: (int, bool) -> bool",
    (fun () ->
-       if Typechecker.subtype_func (Tctxt.empty) [TInt; TInt] (RetVal TBool) [TInt; TInt] (RetVal TBool) then ()
+       if Typechecker.subtype_func (Tctxt.empty) ([TInt; TInt], (RetVal TBool)) ([TInt; TInt], (RetVal TBool)) then ()
        else failwith "should not fail")
 ; ("no subtype func: |- int <: bool",
    (fun () ->
-       if Typechecker.subtype_func Tctxt.empty [TInt; TInt] (RetVal TBool) [TBool; TInt] (RetVal TInt) then
+       if Typechecker.subtype_func Tctxt.empty ([TInt; TInt], (RetVal TBool)) ([TBool; TInt], (RetVal TInt)) then
          failwith "should not succeed" else ())
   )
 ]
@@ -142,6 +166,74 @@ let yanda_tests =
   ]
 ;;
 
+(* Raheem ( nico-nico-nii ) unit tests *)
+let raheem_unit_test = [
+  "subtype: |- string[] <: string[]",
+   (fun () ->
+       if Typechecker.subtype Tctxt.empty
+           (TRef (RArray (TRef RString))) (TRef (RArray (TRef RString)))
+       then () else failwith "should not fail")
+   ; ("no subtype: |- string[] </: string?[]",
+   (fun () ->
+       if Typechecker.subtype Tctxt.empty 
+           (TRef (RArray (TRef RString))) (TRef (RArray (TNullRef RString)))
+       then failwith "should not succeed" else ())
+  )
+]
+
+(* Will Grace unit tests *)
+let will_grace_cast = Oat.Ast.(
+    no_loc @@ Cast (
+      RArray TInt,
+      "a",
+      no_loc (Lhs (no_loc (Id "arr"))),
+      [],
+      []
+    )
+  )
+
+let will_grace_unit_tests = [
+  ( "ifq: |- arr:int[]?, if?(int[] a=arr){} else{}"
+  , (fun () ->
+     let open Oat.Ast in
+     let tc = Tctxt.add_local Tctxt.empty "arr" (TNullRef (RArray TInt)) in
+     let _ =
+       Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt) will_grace_cast
+     in
+     ()))
+; ( "no ifq: |- arr:int[], if?(int[] a=arr){} else{}"
+  , (fun () ->
+     let open Oat.Ast in
+     let tc = Tctxt.add_local Tctxt.empty "arr" (TRef (RArray TInt)) in
+     try
+       let _ =
+         Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt) will_grace_cast
+       in
+       failwith "negative test succeeded"
+     with
+     | Typechecker.TypeError _ -> ()
+    ))
+]
+
+let colin_jishnu_tests = 
+  [ ("typ_bop: ⊢ 0+1: int",
+    fun () -> 
+      let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CInt 0L)), (no_loc (CInt 1L))))) in 
+      if Typechecker.typecheck_exp Tctxt.empty exp = TInt then () else failwith "should succeed"
+    );
+    ("typ_intOps Negative: ⊢ false+1: TypeError",
+      fun () -> 
+        let exp = Oat.Ast.(no_loc (Bop (Add, (no_loc (CBool false)), (no_loc (CInt 1L))))) in 
+        try
+          let _ = Typechecker.typecheck_exp Tctxt.empty exp in
+          failwith "Should fail"
+        with
+        | Typechecker.TypeError _ -> ()
+        | _ -> failwith "exception other than TypeError"
+    ) 
+  ]
+;;
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -149,7 +241,10 @@ let all_student_unit_tests =
   googlers_tests @
   arnav_john_unit_tests @
   ayush_isaac_test @
-  yanda_tests
+  yanda_tests @
+  raheem_unit_test @
+  will_grace_unit_tests @
+  colin_jishnu_tests
 
 let rec n_ones n =
   match n with
@@ -196,6 +291,10 @@ let bplus_tree_expected_4_128 = "quarter:\nx: -32y: 32z: -32\nthree quarters:\nx
 let bplus_tree_expected_8_2048 = "quarter:\nx: -512y: 512z: -512\nthree quarters:\nx: 1536y: -1536z: 1536\n 0"
 let bplus_tree_expected_128_64 = "quarter:\nx: -16y: 16z: -16\nthree quarters:\nx: 48y: -48z: 48\n 0"
 
+(* Ayush Isaac complex tests *)
+let ai_text1 = "sigma sigma on the wall who’s the skibidiest of them all you are you are yes you are "
+let ai_text2 = "Im over here taking a nap rn I got a pillow under my head rn sleeping so soundly Im a snoozer man"
+
 let student_complex_tests : (string * string * string) list = [
     ("demo_color.oat", "", "20");
     ("bplus_tree.oat", Printf.sprintf "%s %s" (n_ones 4) (n_ones 128), bplus_tree_expected_4_128);
@@ -210,4 +309,19 @@ let student_complex_tests : (string * string * string) list = [
     ("linked_list.oat", "4", "39\n39");
     ("linked_list.oat", "5", "0 1 1 2 3 3 4 5 5 6 7 8 9\n0");
     ("linked_list.oat", "6", "9 6 5 5 4 3 3 2 1 1\n0")
+
+    (* Raheem's complex test, implements Stalin Sort with Linked List *)
+    (* See here: https://www.reddit.com/r/ProgrammerHumor/comments/9s9kgn/ *)
+    ("stalin_sort.oat", "6 1 55 0 60 450 3", "6 55 60 450 0");
+    ("stalin_sort.oat", "1 2 3 4 5", "1 2 3 4 5 0");
+    ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
+
+    ("will_grace_nodes.oat", "", "6");
+    (* Isaac and Ayush *)
+    ("hash_table_word_counter.oat", "Im " ^ ai_text2, "There were 2 occurences of the word Im.0");
+    ("hash_table_word_counter.oat", "you " ^ ai_text1, "There were 3 occurences of the word you.0");
+    ("hash_table_word_counter.oat", "are " ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1 ^ ai_text1, "There were 18 occurences of the word are.0");
+
+    (* Daniel Yang (yanda-hw4) *)
+    ("trie.oat", "", "8 4 1 0 1 0 6 6 5 4 0 0");
 ]

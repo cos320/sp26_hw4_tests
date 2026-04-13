@@ -1,0 +1,210 @@
+/* Inspired from COS226 */
+
+struct Entry {
+    string key;
+    int value
+}
+
+struct HashTable {
+    (Entry) -> void add;
+    (string) -> (Entry?) get
+}
+
+struct LinkedList {
+    LinkedList? next;
+    Entry? value
+}
+
+struct LLHT {
+    (Entry) -> void add;
+    (string) -> (Entry?) get;
+    LinkedList[] buckets
+}
+
+int floordiv(int a, int b){
+    /* a,b positive */
+    var prevmul = 0; /* Greatest number x where we know a >= x * b */
+    var mul = 1;
+    while(a >= mul * b) {
+        prevmul = mul;
+        mul = mul * 2;
+    }
+    if (prevmul == 0) {
+        return 0;
+    }
+    else {
+        return prevmul + floordiv(a - prevmul * b, b);
+    }
+
+}
+
+int rem(int a, int b) {
+    return a - (floordiv(a, b) * b);
+}
+
+global the_llht = LLHT null;
+
+void llht_add(Entry e){
+    if?(LLHT llht = the_llht) {
+        var hsh = hash(e.key);
+        var bucket = rem(hsh, length(llht.buckets));
+        add(llht.buckets[bucket], e);
+        return;
+    }
+    else {
+        return;
+    }
+}
+Entry? llht_get(string key) {
+    if?(LLHT llht = the_llht) {
+        var hsh = hash(key);
+        var bucket = rem(hsh, length(llht.buckets));
+        return search(llht.buckets[bucket], key);
+    }
+    else {
+        return Entry null;
+    }
+}
+
+void llht_init(int capacity) {
+    if(capacity <= 0){
+        print_string("ABORT!!!\n");
+        return;
+    } else {}
+    the_llht = new LLHT{
+        add = llht_add;
+        get = llht_get;
+        buckets = new LinkedList[capacity]{i -> new_ll_from_entry(Entry null)}
+    };
+    return;
+}
+
+
+int hash(string s) {
+    var chars = array_of_string(s);
+    var output = 0;
+    for (var i = 0; i < length(chars); i = i + 1;) {
+        output = chars[i] + output * 31;
+    }
+    return output [&] 9223372036854775807;
+}
+
+bool streq(string? s1_maybenull, string? s2_maybenull) {
+    if?(string s1 = s1_maybenull){
+        if?(string s2 = s2_maybenull){
+            return intarreq(array_of_string(s1), array_of_string(s2));
+        }
+        else {
+            return false; 
+        }
+    }
+    else{
+        if?(string s2 = s2_maybenull){
+            return false;
+        }
+        else {
+            /* Both null */
+            return true;
+        }
+    }
+}
+
+bool intarreq(int[] arr1, int[] arr2) {
+    if (length(arr1) != length(arr2)) {
+        return false;
+    }
+    else {
+        for(var i = 0; i < length(arr1); i = i + 1;){
+            if (arr1[i] != arr2[i]){return false;} else {}
+        }
+        return true;
+    }
+}
+
+LinkedList? next(LinkedList? node) {
+    if?(LinkedList node_cast = node) {
+        return node_cast.next;
+    }
+    else {
+        return LinkedList null;
+    }
+}
+
+string? key(LinkedList? node) {
+    if?(Entry e = value(node)) {
+        return e.key;
+    }
+    else {
+        return string null;
+    }
+}
+
+Entry? value(LinkedList? node) {
+    if?(LinkedList node_cast = node) {
+        return node_cast.value;
+    }
+    else {
+        return Entry null;
+    }
+}
+
+Entry? search(LinkedList? ll, string needle) {
+    var haystack = ll;
+    while((haystack != LinkedList null) & (!streq(key(haystack), needle)))
+    {
+        haystack = next(haystack);
+    }
+    return value(haystack);
+}
+
+LinkedList new_ll_from_entry(Entry? e){
+    return new LinkedList{next=LinkedList null; value=e};
+}
+
+Entry entry(string key, int value){
+    return new Entry{key=key; value=value};
+}
+
+void add(LinkedList ll, Entry e) {
+    var ll_new = new_ll_from_entry(e);
+    for (; ll.next != LinkedList null;){
+        if?(LinkedList ll_next = ll.next){
+            ll = ll_next;
+        } 
+        else {
+        }
+    }
+    ll.next = ll_new;
+    return;
+}
+
+
+int program(int argc, string[] argv){
+    llht_init(floordiv(argc, 5) + 1);
+    if?(HashTable ht = the_llht) {
+        var to_count = argv[1];
+        for (var i = 2; i < length(argv); i = i + 1;) {
+            var s = argv[i];
+            if?(Entry e = ht.get(s)){
+                e.value = e.value + 1;
+            }
+            else{
+                ht.add(entry(s, 1));
+            }
+        }
+        var occurences = 0;
+        if?(Entry e = ht.get(to_count)){
+            occurences = e.value;
+        } else {}
+        print_string("There were ");
+        print_int(occurences);
+        print_string(" occurences of the word ");
+        print_string(to_count);
+        print_string(".\n");
+        return 0;
+    }
+    else {
+        return 1;
+    }
+
+}
