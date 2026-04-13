@@ -115,14 +115,18 @@ let googlers_tests = [
 
 (* Arnav Ambre and John Wu's tests below *)
 let arnav_john_unit_tests = [
-  "subtype func: |- (int, int) -> bool <: (int, int) -> bool",
+  "subtype: |- (int, int) -> bool <: (int, int) -> bool",
    (fun () ->
-       if Typechecker.subtype_func (Tctxt.empty) [TInt; TInt] (RetVal TBool) [TInt; TInt] (RetVal TBool) then ()
+       if Typechecker.subtype Tctxt.empty
+        (TRef (RFun ([TInt; TInt], RetVal TBool)))
+        (TRef (RFun ([TInt; TInt], RetVal TBool))) then ()
        else failwith "should not fail")
-; ("no subtype func: |- (int, int) -> bool <: (bool, int) -> int",
+; ("no subtype: |- (int, int) -> bool <: (bool, int) -> int",
    (fun () ->
-       if Typechecker.subtype_func Tctxt.empty [TInt; TInt] (RetVal TBool) [TBool; TInt] (RetVal TInt) then
-         failwith "should not succeed" else ())
+       if Typechecker.subtype Tctxt.empty
+        (TRef (RFun ([TInt; TInt], RetVal TBool)))
+        (TRef (RFun ([TBool; TInt], RetVal TInt))) then
+        failwith "should not succeed" else ())
   )
 ]
 
