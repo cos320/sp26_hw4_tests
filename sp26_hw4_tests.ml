@@ -253,6 +253,38 @@ let yichi_zhang_unit_tests = [
       else ()))
 ]
 
+(* Hita Gupta's unit tests *)
+let hitagu_proj_ctxt =
+  Tctxt.empty
+  |> fun c -> Tctxt.add_struct c "Point"
+    Oat.Ast.[{fieldName = "x"; ftyp = TInt}; {fieldName = "y"; ftyp = TBool}]
+
+let hitagu_point_exp =
+  Oat.Ast.(no_loc @@ CStruct ("Point", 
+    [("x", no_loc @@ CInt 1L); ("y", no_loc @@ CBool true)]))
+
+let hitagu_tests = [
+  ("proj: ⊢ (new Point{x=1;y=true}).x : int",
+    (fun () ->
+      match
+        (try Some (Typechecker.typecheck_exp hitagu_proj_ctxt
+          Oat.Ast.(no_loc @@ Lhs (no_loc @@ Proj (hitagu_point_exp, "x"))))
+         with Typechecker.TypeError _ -> None)
+      with
+      | Some Oat.Ast.TInt -> ()
+      | Some _ -> failwith "expected TInt"
+      | None -> failwith "unexpected TypeError"))
+  ; ("proj negative: ⊢ (new Point{x=1;y=true}).z : TypeError",
+    (fun () ->
+      match
+        (try Some (Typechecker.typecheck_exp hitagu_proj_ctxt
+          Oat.Ast.(no_loc @@ Lhs (no_loc @@ Proj (hitagu_point_exp, "z"))))
+         with Typechecker.TypeError _ -> None)
+      with
+      | None -> ()
+      | Some _ -> failwith "expected TypeError for unknown field"))
+]
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -264,7 +296,8 @@ let all_student_unit_tests =
   raheem_unit_test @
   will_grace_unit_tests @
   colin_jishnu_tests @
-  yichi_zhang_unit_tests
+  yichi_zhang_unit_tests @
+  hitagu_tests
 
 let rec n_ones n =
   match n with
