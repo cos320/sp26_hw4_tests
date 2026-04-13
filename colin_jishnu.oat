@@ -61,6 +61,7 @@ int program(int argc, string[] argv) {
     var mapped = map_tree(root, square);
     print_tree(mapped);
     print_string("\n");
+    print_string(" ");
 
     return 0;
 }

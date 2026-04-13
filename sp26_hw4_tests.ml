@@ -199,7 +199,7 @@ let will_grace_unit_tests = [
      let open Oat.Ast in
      let tc = Tctxt.add_local Tctxt.empty "arr" (TNullRef (RArray TInt)) in
      let _ =
-       Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt) will_grace_cast
+       Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt)
      in
      ()))
 ; ( "no ifq: |- arr:int[], if?(int[] a=arr){} else{}"
@@ -208,7 +208,7 @@ let will_grace_unit_tests = [
      let tc = Tctxt.add_local Tctxt.empty "arr" (TRef (RArray TInt)) in
      try
        let _ =
-         Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt) will_grace_cast
+         Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt)
        in
        failwith "negative test succeeded"
      with
@@ -371,7 +371,7 @@ let student_complex_tests : (string * string * string) list = [
     ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
 
     ("will_grace_nodes.oat", "", "6");
-    ("colin_jishnu.oat", "", "(4 (1 null null) (9 null null))\n0");
+    ("colin_jishnu.oat", "", "(4 (1 null null) (9 null null))\n 0");
 
     (* Isaac and Ayush *)
     ("hash_table_word_counter.oat", "Im " ^ ai_text2, "There were 2 occurences of the word Im.0");
@@ -381,9 +381,9 @@ let student_complex_tests : (string * string * string) list = [
     (* Daniel Yang (yanda-hw4) *)
     ("trie.oat", "", "8 4 1 0 1 0 6 6 5 4 0 0");
     ("yichi_zhang_reverse_list.oat", "", "4 3 2 1 10");
-    
+
     (* Arnav_john Test Case *)
-    ("VEB_Sort.oat", "2", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19");
-    ("VEB_Sort.oat", "3 3", "81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100");
-    ("VEB_Sort.oat", "4 4 4", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14")
+    ("VEB_Sort.oat", "2", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 0");
+    ("VEB_Sort.oat", "3 3", "81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 0");
+    ("VEB_Sort.oat", "4 4 4", "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 0")
 ]
