@@ -1,0 +1,28 @@
+/* will grace complex test. linked list with three nodes, tests if?*/
+
+struct Node {
+  int value;
+  Node? tail;
+  (int, int) -> int op
+}
+
+int mul(int x, int y) { return x * y; }
+int add(int x, int y) { return x + y; }
+
+int fold_right(Node? c, int acc) {
+  if?(Node h = c) {
+    var step = h.op(acc, h.value);
+    return fold_right(h.tail, step);
+  } else {
+    return acc;
+  }
+}
+
+int program(int argc, string[] argv) {
+  var coeffs = new int[3]{i -> i + 1};
+  var t0 = Node null;
+  var t1 = new Node { value = coeffs[2]; tail = t0; op = mul };
+  var t2 = new Node { value = coeffs[1]; tail = t1; op = mul };
+  var head = new Node { value = coeffs[0]; tail = t2; op = add };
+  return fold_right(head, 0);
+}

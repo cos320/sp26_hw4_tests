@@ -157,6 +157,40 @@ let raheem_unit_test = [
   )
 ]
 
+(* Will Grace unit tests *)
+let will_grace_cast = Oat.Ast.(
+    no_loc @@ Cast (
+      RArray TInt,
+      "a",
+      no_loc (Lhs (no_loc (Id "arr"))),
+      [],
+      []
+    )
+  )
+
+let will_grace_unit_tests = [
+  ( "ifq: |- arr:int[]?, if?(int[] a=arr){} else{}"
+  , (fun () ->
+     let open Oat.Ast in
+     let tc = Tctxt.add_local Tctxt.empty "arr" (TNullRef (RArray TInt)) in
+     let _ =
+       Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt) will_grace_cast
+     in
+     ()))
+; ( "no ifq: |- arr:int[], if?(int[] a=arr){} else{}"
+  , (fun () ->
+     let open Oat.Ast in
+     let tc = Tctxt.add_local Tctxt.empty "arr" (TRef (RArray TInt)) in
+     try
+       let _ =
+         Typechecker.typecheck_stmt tc will_grace_cast (RetVal TInt) will_grace_cast
+       in
+       failwith "negative test succeeded"
+     with
+     | Typechecker.TypeError _ -> ()
+    ))
+]
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
@@ -165,7 +199,8 @@ let all_student_unit_tests =
   arnav_john_unit_tests @
   ayush_isaac_test @
   yanda_tests @
-  raheem_unit_test
+  raheem_unit_test @
+  will_grace_unit_tests
 
 let rec n_ones n =
   match n with
@@ -223,5 +258,7 @@ let student_complex_tests : (string * string * string) list = [
     (* See here: https://www.reddit.com/r/ProgrammerHumor/comments/9s9kgn/ *)
     ("stalin_sort.oat", "6 1 55 0 60 450 3", "6 55 60 450 0");
     ("stalin_sort.oat", "1 2 3 4 5", "1 2 3 4 5 0");
-    ("stalin_sort.oat", "69 68 67 67 67 67", "69 0")
+    ("stalin_sort.oat", "69 68 67 67 67 67", "69 0");
+
+    ("will_grace_nodes.oat", "", "6")
 ]
