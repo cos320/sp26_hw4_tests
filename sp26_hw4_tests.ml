@@ -101,13 +101,55 @@ let arnav_john_unit_tests = [
   )
 ]
 
+(* Daniel Yang (yanda-hw4) unit tests *)
+let struct_subtype_ctxt =
+  Tctxt.empty
+  |> (fun c ->
+  Tctxt.add_struct
+    c
+    "S2"
+    Oat.Ast.[ { fieldName = "x"; ftyp = TInt }; { fieldName = "y"; ftyp = TInt } ])
+  |> fun c ->
+  Tctxt.add_struct
+    c
+    "S3"
+    Oat.Ast.
+      [ { fieldName = "x"; ftyp = TInt }
+      ; { fieldName = "y"; ftyp = TInt }
+      ; { fieldName = "z"; ftyp = TInt }
+      ]
+;;
+
+let yanda_tests =
+  [ ( "subtype (sub_subr_struct): S3 <: S2"
+    , fun () ->
+        if
+          Typechecker.subtype
+            struct_subtype_ctxt
+            (TRef (RStruct "S3"))
+            (TRef (RStruct "S2"))
+        then ()
+        else failwith "should not fail" )
+  ; ( "no subtype (sub_subr_struct): S2 </: S3"
+    , fun () ->
+        if
+          Typechecker.subtype
+            struct_subtype_ctxt
+            (TRef (RStruct "S2"))
+            (TRef (RStruct "S3"))
+        then failwith "should not succeed"
+        else () )
+  ]
+;;
+
 (* TODO: Add your test cases to this list. *)
 let all_student_unit_tests =
   example_unit_tests1 @
   example_unit_tests2 @
   googlers_tests @
   arnav_john_unit_tests @
-  ayush_isaac_test
+  ayush_isaac_test @
+  yanda_tests
 
 let rec n_ones n =
   match n with
