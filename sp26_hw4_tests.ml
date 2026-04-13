@@ -70,17 +70,17 @@ let ai_run_test (e:Oat.Ast.exp Oat.Ast.node) : bool =
   try 
     let ty = Typechecker.typecheck_exp Tctxt.empty e in
     (ty = Oat.Ast.(TRef(RArray(TInt))))
-  with
-  | Typechecker.TypeError _ -> false
+  with Typechecker.TypeError _ -> false
 
 let ayush_isaac_test = [
-  ("TYP_NEWARRAYINIT: H;G;L ⊢ new t[exp1]{x -> exp2} : t[]",
+  ("TYP_NEWARRAYINIT: ⊢ new int[5]{x -> x + 1} : int[]",
     (fun () ->
-    if ai_run_test ai_test_pos then ()
-    else failwith "should not fail"))
-  ; ("TYP_NEWARRAYINIT: negative test", (fun () ->
-    if ai_run_test ai_test_neg then failwith "should not pass"
-    else ()
+        if ai_run_test ai_test_pos then ()
+        else failwith "should not fail"))
+  ; ("TYP_NEWARRAYINIT negative: ⊢ new int[5]{x -> true} : TypeError", 
+      (fun () ->
+        if ai_run_test ai_test_neg then failwith "should not pass"
+        else ()
     ))
 ]
 
