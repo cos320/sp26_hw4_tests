@@ -1,6 +1,9 @@
+/*
+Ben Aepli and Vedant Badoni's test case.
+*/
 struct BPlusTree {
     int m;
-    /* The comparator should return a negative value 
+    /* The comparator should return a negative value
     if the first element is less than the second. */
     (int, int) -> int comparator;
     BPlusNode root
@@ -70,19 +73,19 @@ void bplus_insert(BPlusTree tree, int key, Data value)
 {
     var result = bplus_impl_search(tree, tree.root, key);
 
-    if?(BPlusNode leaf = result.node) 
+    if?(BPlusNode leaf = result.node)
     {
-        if?(Data data = result.data) 
+        if?(Data data = result.data)
         {
             leaf.data[result.idx] = value;
             return;
         }
-        if (leaf.numKeys < tree.m - 1) 
+        if (leaf.numKeys < tree.m - 1)
         {
             bplus_impl_sortedInsert(tree, leaf.keys, leaf.data, leaf.numKeys, key, value);
             leaf.numKeys = leaf.numKeys + 1;
-        } 
-        else 
+        }
+        else
         {
             bplus_impl_insertSplit(tree, leaf, key, value);
         }
@@ -99,7 +102,7 @@ void bplus_impl_insertSplit(BPlusTree tree, BPlusNode leaf, int key, Data value)
     var totalKeys = tree.m;
     var tempKeys = new int[totalKeys];
     var tempData = new Data?[totalKeys];
-    for (var i = 0; i < leaf.numKeys; i = i + 1;) 
+    for (var i = 0; i < leaf.numKeys; i = i + 1;)
     {
         tempKeys[i] = leaf.keys[i];
         tempData[i] = leaf.data[i];
@@ -118,33 +121,33 @@ void bplus_impl_insertSplit(BPlusTree tree, BPlusNode leaf, int key, Data value)
         next = leaf.next;
         previous = leaf
     };
-    for (var i = split; i < totalKeys; i = i + 1;) 
+    for (var i = split; i < totalKeys; i = i + 1;)
     {
         right.keys[i - split] = tempKeys[i];
         right.data[i - split] = tempData[i];
     }
     leaf.numKeys = split;
-    for (var i = 0; i < split; i = i + 1;) 
+    for (var i = 0; i < split; i = i + 1;)
     {
         leaf.keys[i] = tempKeys[i];
         leaf.data[i] = tempData[i];
     }
-    for (var i = split; i < tree.m - 1; i = i + 1;) 
+    for (var i = split; i < tree.m - 1; i = i + 1;)
     {
         leaf.data[i] = Data null;
     }
     leaf.next = right;
-    if?(BPlusNode oldNext = right.next) 
+    if?(BPlusNode oldNext = right.next)
     {
         oldNext.previous = right;
     }
 
-    if?(BPlusNode p = leaf.parent) 
+    if?(BPlusNode p = leaf.parent)
     {
         var idx = bplus_impl_childIndex(p, leaf);
         bplus_impl_insertSeparator(tree, p, idx, right.keys[0], right);
-    } 
-    else 
+    }
+    else
     {
         var newRoot = new BPlusNode {
             isLeaf = false;
@@ -172,10 +175,10 @@ Recursively insert a separator key and new child into a parent node at the given
 */
 void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int key, BPlusNode child)
 {
-    if (parent.numKeys < tree.m - 1) 
+    if (parent.numKeys < tree.m - 1)
     {
         var i = parent.numKeys;
-        while (i > index) 
+        while (i > index)
         {
             parent.keys[i] = parent.keys[i - 1];
             i = i - 1;
@@ -183,7 +186,7 @@ void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int
         parent.keys[index] = key;
 
         var j = parent.numKeys + 1;
-        while (j > index + 1) 
+        while (j > index + 1)
         {
             parent.children[j] = parent.children[j - 1];
             j = j - 1;
@@ -209,40 +212,40 @@ void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int
     };
     var promotedKey = 0;
     var j = 0;
-    for (var i = 0; i < tree.m; i = i + 1;) 
+    for (var i = 0; i < tree.m; i = i + 1;)
     {
         /*
         We walk from i to m, pulling either the new key/child when i == index
-        or from the parent. 
+        or from the parent.
 
         Below the midpoint, keep. At the midpoint, I promote. After goes to the right.
         */
         var curKey = 0;
         var curChild = BPlusNode null;
 
-        if (i == index) 
+        if (i == index)
         {
             curKey = key;
             curChild = child;
-        } 
-        else 
+        }
+        else
         {
             curKey = parent.keys[j];
             curChild = parent.children[j + 1];
             j = j + 1;
         }
 
-        if (i < mid) 
+        if (i < mid)
         {
             parent.keys[i] = curKey;
             parent.children[i + 1] = curChild;
-        } 
-        else if (i == mid) 
+        }
+        else if (i == mid)
         {
             promotedKey = curKey;
             parent.children[i + 1] = curChild;
-        } 
-        else 
+        }
+        else
         {
             right.keys[i - mid - 1] = curKey;
             right.children[i - mid] = curChild;
@@ -252,12 +255,12 @@ void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int
     right.children[0] = parent.children[mid + 1];
     parent.numKeys = mid;
 
-    for (var i = mid; i < tree.m - 1; i = i + 1;) 
+    for (var i = mid; i < tree.m - 1; i = i + 1;)
     {
         parent.children[i + 1] = BPlusNode null;
     }
 
-    for (var i = 0; i <= right.numKeys; i = i + 1;) 
+    for (var i = 0; i <= right.numKeys; i = i + 1;)
     {
         if?(BPlusNode c = right.children[i])
         {
@@ -265,7 +268,7 @@ void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int
         }
     }
 
-    if (parent.parent == BPlusNode null) 
+    if (parent.parent == BPlusNode null)
     {
         var newRoot = new BPlusNode {
             isLeaf = false;
@@ -284,9 +287,9 @@ void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int
         right.parent = newRoot;
         tree.root = newRoot;
     }
-    else 
+    else
     {
-        if?(BPlusNode gp = parent.parent) 
+        if?(BPlusNode gp = parent.parent)
         {
             var idx = bplus_impl_childIndex(gp, parent);
             bplus_impl_insertSeparator(tree, gp, idx, promotedKey, right);
@@ -298,11 +301,11 @@ void bplus_impl_insertSeparator(BPlusTree tree, BPlusNode parent, int index, int
 
 int bplus_impl_childIndex(BPlusNode parent, BPlusNode child)
 {
-    for (var i = 0; i <= parent.numKeys; i = i + 1;) 
+    for (var i = 0; i <= parent.numKeys; i = i + 1;)
     {
-        if?(BPlusNode c = parent.children[i]) 
+        if?(BPlusNode c = parent.children[i])
         {
-            if (c == child) 
+            if (c == child)
             {
                 return i;
             }
@@ -318,7 +321,7 @@ void bplus_impl_sortedInsert(BPlusTree tree, int[] keys, Data?[] data, int numKe
 {
     var i = numKeys;
     var done = false;
-    while (i > 0 & !done) 
+    while (i > 0 & !done)
     {
         if (tree.comparator(key, keys[i - 1]) < 0) {
             keys[i] = keys[i - 1];
@@ -342,9 +345,9 @@ struct BPlus_impl_FindResult {
 BPlus_impl_FindResult bplus_impl_search(BPlusTree tree, BPlusNode current, int target)
 {
     if (current.isLeaf) {
-        for (var i = 0; i < current.numKeys; i = i + 1;) 
+        for (var i = 0; i < current.numKeys; i = i + 1;)
         {
-            if (current.keys[i] == target) 
+            if (current.keys[i] == target)
             {
                 return new BPlus_impl_FindResult { idx = i; data = current.data[i]; node = current };
             }
@@ -354,34 +357,34 @@ BPlus_impl_FindResult bplus_impl_search(BPlusTree tree, BPlusNode current, int t
 
     var i = 0;
     var done = false;
-    while (i < current.numKeys & !done) 
+    while (i < current.numKeys & !done)
     {
-        if (tree.comparator(target, current.keys[i]) >= 0) 
+        if (tree.comparator(target, current.keys[i]) >= 0)
         {
             i = i + 1;
-        } 
-        else 
+        }
+        else
         {
             done = true;
         }
     }
 
-    if?(BPlusNode child = current.children[i]) 
+    if?(BPlusNode child = current.children[i])
     {
         return bplus_impl_search(tree, child, target);
-    } 
-    else 
+    }
+    else
     {
         return new BPlus_impl_FindResult { idx = -1; data = Data null; node = BPlusNode null };
     }
 }
 
-int keyCompare(int x, int y) 
+int keyCompare(int x, int y)
 {
     return x - y;
 }
 
-void printData(Data? d) 
+void printData(Data? d)
 {
     if? (Data data = d) {
         print_string("x: ");
