@@ -177,7 +177,6 @@ void list_print(List l) {
       done = true;
     }
   }
-  print_string("\n");
   return;
 }
 
@@ -210,53 +209,33 @@ bool fn_is_even(int x) {
 int program(int argc, string[] argv) {
   var base = list_from_array(new int[]{3, 1, 4, 1, 5, 9, 2, 6, 5, 3});
   var asc = list_sort(base, fn_asc);
-  var mode = 0;
-  if (argc >= 2) {
-    mode = string_to_int(argv[1])
-  }
 
   /* sort ascending */
-  if (mode == 0) {
-    list_print(asc);
-    return 0;
-  }
+  if (argc == 1) { list_print(asc); return 0; }
 
   /* sort descending */
-  if (mode == 1) {
-    list_print(list_sort(base, fn_desc));
-    return 0;
-  }
+  if (argc == 2) { list_print(list_sort(base, fn_desc)); return 0; }
 
   /* map */
-  if (mode == 2) {
-    list_print(list_map(asc, fn_double));
-    return 0;
-  }
+  if (argc == 3) { list_print(list_map(asc, fn_double)); return 0; }
 
   /* filter */
-  if (mode == 3) {
-    list_print(list_filter(asc, fn_is_even));
-    return 0;
-  }
+  if (argc == 4) { list_print(list_filter(asc, fn_is_even)); return 0; }
 
   /* fold (sum) */
-  if (mode == 4) {
-    var total = list_fold(asc, fn_add, 0);
-    print_int(total);
-    print_string("\n");
+  if (argc == 5) {
+    print_int(list_fold(asc, fn_add, 0));
     return 0;
   }
 
   /* concat */
-  if (mode == 5) {
+  if (argc == 6) {
     var extra = list_from_array(new int[]{7, 0, 8});
-    var combined = list_sort(list_concat(base, extra), fn_asc);
-    list_print(combined);
+    list_print(list_sort(list_concat(base, extra), fn_asc));
     return 0;
   }
 
   /* reverse */
-  var rev = list_reverse(asc);
-  list_print(rev);
+  list_print(list_reverse(asc));
   return 0;
 }
