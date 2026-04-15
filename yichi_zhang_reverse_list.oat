@@ -23,6 +23,7 @@ Node? reverse(Node? head) {
       return prev;
     }
   }
+  return prev;
 }
 
 int print_and_sum(Node? head) {
@@ -39,6 +40,7 @@ int print_and_sum(Node? head) {
       return sum;
     }
   }
+  return sum;
 }
 
 int program(int argc, string[] argv) {
